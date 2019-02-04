@@ -1,0 +1,73 @@
+---
+title: "Group Lab 2"
+author: "James Lyou"
+date: "January 30, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+
+#baseData=read.csv("wa_od_main_JT01_2015.csv")
+
+#odData=baseData
+
+#Filter out Tacoma Codes and pretty up the geocodes
+#odData <- filter(odData, w_geocode > 530530603000000 & w_geocode < 530530620999999 | h_geocode > 530530603000000 & h_geocode < 530530620999999)
+#odData$w_geocode<-as.character(odData$w_geocode)
+#odData$h_geocode<-as.character(odData$h_geocode)
+#odData$w_geocode[which(length(odData$w_geocode) == 14)]<-paste0("0",odData$w_geocode[which(length(odData$w_geocode) == 14)])
+#odData$h_geocode[which(length(odData$h_geocode) == 14)]<-paste0("0",odData$h_geocode[which(length(odData$h_geocode) == 14)])
+
+#Making Columns for worktract and hometract
+#odData$wt<-substr(odData$w_geocode,1,11)
+#odData$ht<-substr(odData$h_geocode,1,11)
+
+#odData
+```
+
+```{r}
+racBaseData=read.csv("wa_rac_S000_JT01_2015.csv")
+
+racData=racBaseData
+racData$h_geocode[which(length(racData$h_geocode) == 14)]<-paste0("0", racData$h_geocode[which(length(racData$h_geocode) == 14)])
+racData$ht<-substr(racData$h_geocode,1,11)
+
+aggRACData <- select(racData, ht)
+aggRACData <- unique(aggRACData)
+aggRACData <- arrange(aggRACData, ht)
+
+counter = 2
+while(counter <= 42){
+  aggRACData[c(colnames(racData)[counter])] <- 0
+  counter <- counter + 1
+}
+
+aggRACCount <- 1
+for(i in aggRACData$ht) {
+  baseRACCount <- 1
+  while(baseRACCount <= nrow(racData)) {
+    if(racData[baseRACCount, 44] == i){
+      counterJ = 2
+      while(counterJ <= 42) {
+        if(racData[baseRACCount, counterJ] != 0) {
+          aggRACData[aggRACCount, counterJ] <- aggRACData[aggRACCount, counterJ] + racData[baseRACCount, counterJ]
+        }
+        counterJ <- counterJ + 1
+      }
+    }
+    baseRACCount <- baseRACCount + 1
+  }
+  aggRACCount <- aggRACCount + 1
+}
+aggRACData
+```
+
+```{r}
+#baseData=read.csv("wa_wac_S000_JT01_2015.csv")
+
+```
