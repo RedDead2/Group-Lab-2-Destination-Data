@@ -1,0 +1,52 @@
+---
+title: "MoransI"
+author: "Alberto Melendez"
+date: "February 4, 2019"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(sf)
+library(raster)
+library(spdep)
+
+t_blocks <- read.csv("tacoma_blocks2.csv")
+
+t_tracts <- read.csv("tacoma_tracts2.csv")
+
+t_od <- read.csv("od2015_Tacoma.csv")
+
+t_od$h_geocode <- substr(as.character(t_od$h_geocode),
+                          start = 1,
+                          stop = nchar(as.character(t_od$h_geocode)) - 4)
+
+t_rac <- read.csv("rac2015_Tacoma.csv")
+
+t_wac <- read.csv("wac2015_Tacoma.csv")
+
+t_blocks$h_geocode <- t_blocks$GEOID10
+
+t_blocks$h_geocode <- substr(as.character(t_blocks$h_geocode),
+                          start = 1,
+                          stop = nchar(as.character(t_blocks$h_geocode)) - 4)
+
+t_tracts$h_geocode <- t_tracts$GEOID.1
+
+t_rac$h_geocode <- t_rac$ht
+
+t_rac$h_geocode <- substr(as.character(t_rac$h_geocode),
+                          start = 1,
+                          stop = nchar(as.character(t_rac$h_geocode)) - 4)
+
+residental_blocks <- merge(t_blocks, t_rac, by = "h_geocode")
+
+od_blocks <- merge(t_blocks, t_od, by = "h_geocode")
+
+od_tracts <- merge(t_tracts, t_od, by = "h_geocode")
+
+
+moransI <- moran.test(od_blocks$SE03, )
+
+
+```
