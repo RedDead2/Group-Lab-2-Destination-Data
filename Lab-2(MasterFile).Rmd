@@ -1,24 +1,96 @@
 ---
-title: "Lab-2(MasterFile)"
+title: "Mapping Origin-Destination Employment in Tacoma, WA (2019)"
 author: "Andrew Baker, Eman Robi, James Lyou, Alberto Melendez, Jamie Marken"
 date: "January 28, 2019"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+
+```{r}
+library(tidyverse)
+baseData=read.csv("./lab 2 data/OD/wa_od_main_JT01_2015.csv")
+odData=baseData
+#Filter out Tacoma Codes and pretty up the geocodes
+odData <- filter(odData, w_geocode > 530530603000000 & w_geocode < 530530620999999 | h_geocode > 530530603000000 & h_geocode < 530530620999999)
+odData$w_geocode<-as.character(odData$w_geocode)
+odData$h_geocode<-as.character(odData$h_geocode)
+odData$w_geocode[which(length(odData$w_geocode) == 14)]<-paste0("0",odData$w_geocode[which(length(odData$w_geocode) == 14)])
+odData$h_geocode[which(length(odData$h_geocode) == 14)]<-paste0("0",odData$h_geocode[which(length(odData$h_geocode) == 14)])
+#Making Columns for worktract and hometract
+odData$wt<-substr(odData$w_geocode,1,11)
+odData$ht<-substr(odData$h_geocode,1,11)
+write.csv(odData, "od2015_Tacoma.csv")
 ```
 
-
-
-```{r cars}
-summary(cars)
+```{r}
+racBaseData=read.csv("./lab 2 data/RAC/wa_rac_S000_JT01_2015.csv")
+racData=racBaseData
+racData$h_geocode[which(length(racData$h_geocode) == 14)]<-paste0("0", racData$h_geocode[which(length(racData$h_geocode) == 14)])
+racData$ht<-substr(racData$h_geocode,1,11)
+ 
+aggRACData <- select(racData, ht)
+aggRACData <- unique(aggRACData)
+aggRACData <- arrange(aggRACData, ht)
+counter = 2
+while(counter <= 42){
+ aggRACData[c(colnames(racData)[counter])] <- 0
+ counter <- counter + 1
+}
+aggRACCount <- 1
+for(i in aggRACData$ht) {
+ baseRACCount <- 1
+ while(baseRACCount <= nrow(racData)) {
+   if(racData[baseRACCount, 44] == i){
+     counterJ = 2
+     while(counterJ <= 42) {
+       if(racData[baseRACCount, counterJ] != 0) {
+         aggRACData[aggRACCount, counterJ] <- aggRACData[aggRACCount, counterJ] + racData[baseRACCount, counterJ]
+       }
+       counterJ <- counterJ + 1
+     }
+   }
+   baseRACCount <- baseRACCount + 1
+ }
+ aggRACCount <- aggRACCount + 1
+}
+write.csv(aggRACData, "rac2015_Tacoma.csv")
 ```
 
-
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+wacBaseData=read.csv("./Lab 2 Data/WAC/wa_wac_S000_JT01_2015.csv")
+ 
+wacData=wacBaseData
+wacData$w_geocode[which(length(wacData$w_geocode) == 14)]<-paste0("0", wacData$w_geocode[which(length(wacData$w_geocode) == 4)])
+wacData$wt<-substr(wacData$w_geocode,1,11)
+ 
+aggWACData <- select(wacData, wt)
+aggWACData <- unique(aggWACData)
+aggWACData <- arrange(aggWACData, wt)
+ 
+counter = 2
+while(counter <= 52){
+ aggWACData[c(colnames(wacData)[counter])] <- 0
+ counter <- counter + 1
+}
+aggWACCount <- 1
+for(i in aggWACData$wt) {
+  baseWACCount <- 1
+  while(baseWACCount <= nrow(wacData)) {
+    if(wacData[baseWACCount, 54] == i){
+     counterJ = 2
+     while(counterJ <= 52) {
+       if(wacData[baseWACCount, counterJ] != 0) {
+         aggWACData[aggWACCount, counterJ] <- aggWACData[aggWACCount, counterJ] + wacData[baseWACCount, counterJ]
+       }
+       counterJ <- counterJ + 1
+     }
+    }
+    baseWACCount <- baseWACCount + 1
+ }
+  aggWACCount <- aggWACCount + 1
+}
+ 
+write.csv(aggWACData, "wac2015_Tacoma.csv")
 ```
 
 
