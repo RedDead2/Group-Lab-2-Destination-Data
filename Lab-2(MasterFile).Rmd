@@ -5,8 +5,7 @@ date: "January 28, 2019"
 output: html_document
 ---
 
-
-```{r}
+```{r, include=FALSE}
 library(tidyverse)
 baseData=read.csv("./lab 2 data/OD/wa_od_main_JT01_2015.csv")
 odData=baseData
@@ -19,10 +18,10 @@ odData$h_geocode[which(length(odData$h_geocode) == 14)]<-paste0("0",odData$h_geo
 #Making Columns for worktract and hometract
 odData$wt<-substr(odData$w_geocode,1,11)
 odData$ht<-substr(odData$h_geocode,1,11)
-write.csv(odData, "od2015_Tacoma.csv")
+#write.csv(odData, "od2015_Tacoma.csv")
 ```
 
-```{r}
+```{r, include=FALSE}
 racBaseData=read.csv("./lab 2 data/RAC/wa_rac_S000_JT01_2015.csv")
 racData=racBaseData
 racData$h_geocode[which(length(racData$h_geocode) == 14)]<-paste0("0", racData$h_geocode[which(length(racData$h_geocode) == 14)])
@@ -37,26 +36,26 @@ while(counter <= 42){
  counter <- counter + 1
 }
 aggRACCount <- 1
-for(i in aggRACData$ht) {
- baseRACCount <- 1
- while(baseRACCount <= nrow(racData)) {
-   if(racData[baseRACCount, 44] == i){
-     counterJ = 2
-     while(counterJ <= 42) {
-       if(racData[baseRACCount, counterJ] != 0) {
-         aggRACData[aggRACCount, counterJ] <- aggRACData[aggRACCount, counterJ] + racData[baseRACCount, counterJ]
-       }
-       counterJ <- counterJ + 1
-     }
-   }
-   baseRACCount <- baseRACCount + 1
- }
- aggRACCount <- aggRACCount + 1
-}
-write.csv(aggRACData, "rac2015_Tacoma.csv")
+# for(i in aggRACData$ht) {
+#  baseRACCount <- 1
+#  while(baseRACCount <= nrow(racData)) {
+#    if(racData[baseRACCount, 44] == i){
+#      counterJ = 2
+#      while(counterJ <= 42) {
+#        if(racData[baseRACCount, counterJ] != 0) {
+#          aggRACData[aggRACCount, counterJ] <- aggRACData[aggRACCount, counterJ] + racData[baseRACCount, counterJ]
+#        }
+#        counterJ <- counterJ + 1
+#      }
+#    }
+#    baseRACCount <- baseRACCount + 1
+#  }
+#  aggRACCount <- aggRACCount + 1
+# }
+# write.csv(aggRACData, "rac2015_Tacoma.csv")
 ```
 
-```{r}
+```{r, include=FALSE}
 wacBaseData=read.csv("./Lab 2 Data/WAC/wa_wac_S000_JT01_2015.csv")
  
 wacData=wacBaseData
@@ -73,24 +72,23 @@ while(counter <= 52){
  counter <- counter + 1
 }
 aggWACCount <- 1
-for(i in aggWACData$wt) {
-  baseWACCount <- 1
-  while(baseWACCount <= nrow(wacData)) {
-    if(wacData[baseWACCount, 54] == i){
-     counterJ = 2
-     while(counterJ <= 52) {
-       if(wacData[baseWACCount, counterJ] != 0) {
-         aggWACData[aggWACCount, counterJ] <- aggWACData[aggWACCount, counterJ] + wacData[baseWACCount, counterJ]
-       }
-       counterJ <- counterJ + 1
-     }
-    }
-    baseWACCount <- baseWACCount + 1
- }
-  aggWACCount <- aggWACCount + 1
-}
- 
-write.csv(aggWACData, "wac2015_Tacoma.csv")
+# for(i in aggWACData$wt) {
+#   baseWACCount <- 1
+#   while(baseWACCount <= nrow(wacData)) {
+#     if(wacData[baseWACCount, 54] == i){
+#      counterJ = 2
+#      while(counterJ <= 52) {
+#        if(wacData[baseWACCount, counterJ] != 0) {
+#          aggWACData[aggWACCount, counterJ] <- aggWACData[aggWACCount, counterJ] + wacData[baseWACCount, counterJ]
+#        }
+#        counterJ <- counterJ + 1
+#      }
+#     }
+#     baseWACCount <- baseWACCount + 1
+#  }
+#   aggWACCount <- aggWACCount + 1
+# }
+# write.csv(aggWACData, "wac2015_Tacoma.csv")
 ```
 
 
