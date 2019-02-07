@@ -1,0 +1,134 @@
+---
+title: "Part 3 Visualizing and Mapping"
+author: "Emmanuel Robi "
+date: "GEOG 458"
+output: html_document
+---
+  
+```{r Packages, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(sf)
+library(dplyr)
+library(tmap)
+library(leaflet)
+library(ggplot2)
+library(shiny)
+library(maptools)
+library(RColorBrewer)
+```
+
+#Data 
+```{r PART3.3, include = TRUE}
+ODDATA <- read.csv("od2015_Tacoma.csv")
+WACT <- read.csv("wac2015_Tacoma.csv")
+WACB <- read.csv("wac2015_Tacoma_Block.csv")
+tacomablockshp <- st_read("tacomablocks-polygon.shp")
+tacomatractshp <- st_read("pie10ct.shp")
+Washingtontractshp <- st_read("cb_2017_53_tract_500k.shp")
+```
+
+#Part 3.2 
+```{r PART3.3, include = TRUE}
+library(tidyverse)
+baseData=read.csv("wa_od_main_JT01_2015.csv")
+odData=baseData
+#Filter out Tacoma Codes and pretty up the geocodes
+odData <- filter(odData, w_geocode > 530530603000000 & w_geocode < 530530620999999 | h_geocode > 530530603000000 & h_geocode < 530530620999999)
+odData$w_geocode<-as.character(odData$w_geocode)
+odData$h_geocode<-as.character(odData$h_geocode)
+odData$w_geocode[which(length(odData$w_geocode) == 14)]<-paste0("0",odData$w_geocode[which(length(odData$w_geocode) == 14)])
+odData$h_geocode[which(length(odData$h_geocode) == 14)]<-paste0("0",odData$h_geocode[which(length(odData$h_geocode) == 14)])
+#Making Columns for worktract and hometract
+odData$wt<-substr(odData$w_geocode,1,11)
+odData$ht<-substr(odData$h_geocode,1,11)
+odData
+#Plots compare Total Numbers of Jobs to Number of jobs in Goods Producing industry sectors and Number of jobs in Trade, Transportation, and Utilities industry sectors
+p <-ggplot(data = odData, aes(odData$S000, odData$SI01))
+p + geom_bar(stat="identity", aes(fill = odData$SI02)) + xlab("Total Number of Jobs") + ylab("Number of jobs in Goods Producing industry sectors") + labs(fill = "Number of jobs in Trade, Transportation, and Utilities industry sectors")
+```
+
+
+
+#Part 3.3
+```{r PART3.3, include = TRUE}
+library(dplyr)
+
+###Create Map 1
+# Block Shapefile with WAC 
+WACB$GEOID10= WACB$w_geocode
+
+
+WACBLOCK <- merge(tacomablockshp, WACB, by=c("GEOID10"))
+
+#Change label name for plot Block 
+WACBLOCK$Population = WACBLOCK$CE01
+
+
+#plot block
+BLOCK_MAP <- tm_shape(WACBLOCK) +tm_polygons() +tm_symbols(col="Population") + tm_borders() +tm_layout(title = "Number of jobs with earnings $1250/month or less in the City of Tacoma on a Block Level", title.position = c("RIGHT", "TOP")) 
+
+BLOCK_MAP
+
+##Create Map 2
+#Number of jobs with earnings $1250/month or less 
+#plot 2 track
+WACT$GEOID10 = WACT$wt
+WACTRACT <- merge(tacomatractshp, WACT, by=c("GEOID10"))
+WACTRACT$Population = WACTRACT$CE01
+
+TRACT_MAP <- tm_shape(WACTRACT) +tm_polygons() +tm_symbols(col="Population") + tm_borders() +tm_layout(title = "Number of jobs with earnings $1250/month or less in the City of Tacoma on a Tract Level", title.position = c("RIGHT", "TOP"))
+
+TRACT_MAP
+```
+
+
+#Part 3.4
+```{r PART3.4, include = TRUE}
+###Create Map of OD 
+HomeTract1 <-filter(ODDATA, ht == 53053060905)
+
+Washingtontractshp$wt = Washingtontractshp$GEOID
+
+HomeTract1Merge <- merge(Washingtontractshp, HomeTract1, by=c("wt"), all = TRUE)
+HomeTract1Merge[is.na(HomeTract1Merge)] <- 0 
+
+ tm_shape(HomeTract1Merge) +tm_polygons() +  tm_symbols(col="wt") + tm_borders() +tm_layout(title = "Points of places where people who live in area 53053060905 work", title.position = c("RIGHT", "TOP")) 
+
+```
+
+#Part 3.6 (working still)
+```{r PART3.6, include = TRUE}
+
+#Note: Could not zoom into city level due to shapefile restrictions
+#Taking the WACT and inputting the Transportation and Warehousing industry data into a column
+WACT$GEOID10 = WACT$wt
+WACTRACT <- merge(tacomatractshp, WACT, by=c("GEOID10"))
+WACTRACT$Transportion_Warehouse = WACTRACT$CNS08
+
+#Taking data from the new column, and h_geocode column and putting them into objects  
+Transportion_warehouse <- WACTRACT$Transportion_Warehouse
+home_tracts <- TACOMATRACT$h_geocode
+
+# LQ Calculation function
+ LQ <- function(Transportion, home_tracts) {
+
+	sdp<- Transportion / home_tracts
+	dp<-  sum(Transportion)/ sum(home_tracts)
+	sdp/dp
+ }
+
+#Inputting the LQ data into a new column
+WACTRACT$Transportion_Warehouse <- LQ(Transportion_warehouse, home_tracts)
+
+tmap_mode("plot")
+
+#Maps out the LQ of Transportation and Warehousing Industry in Pierce County  
+LQ_MAP <- tm_shape(WACTRACT) + tm_polygons() + tm_dots(breaks = "Transportation_Warehouse", size = .8) + tm_borders() + tm_layout(title = "Location Quotients (LQ) of the Transporation and Warehouse Industry (Based On households)", title.position = c("RIGHT", "TOP")) 
+
+LQ_MAP
+ 
+
+ 
+```
+
