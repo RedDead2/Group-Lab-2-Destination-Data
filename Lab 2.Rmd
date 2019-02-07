@@ -19,13 +19,11 @@ library(shiny)
 #Data 
 ```{r PART3.3, include = TRUE}
 ODDATA <- read.csv("od2015_Tacoma.csv")
-block_data <- read.csv("tacoma_blocks2.csv")
-track_data <- read.csv("tacoma_tracts2.csv")
 WACT <- read.csv("wac2015_Tacoma.csv")
 WACB <- read.csv("wac2015_Tacoma_Block.csv")
 tacomablockshp <- st_read("tacomablocks-polygon.shp")
-tacomatrackshp <- st_read("pie10ct.shp")
-Washingtontrackshp <- st_read("cb_2017_53_tract_500k.shp")
+tacomatractshp <- st_read("pie10ct.shp")
+Washingtontractshp <- st_read("cb_2017_53_tract_500k.shp")
 ```
 
 #Part 3.2 
@@ -73,28 +71,31 @@ BLOCK_MAP
 ##Create Map 2
 #Number of jobs with earnings $1250/month or less 
 #plot 2 track
-WACTRACK <- merge(tacomatrackshp, WACT, by=c("GEOID10"))
-WACTRACK$Population = WACTRACK$CE01
+WACT$GEOID10 = WACT$wt
+WACTRACT <- merge(tacomatractshp, WACT, by=c("GEOID10"))
+WACTRACT$Population = WACTRACT$CE01
 
-TRACK_MAP <- tm_shape(WACTRACK) +tm_polygons() +tm_symbols(col="Population") + tm_borders() +tm_layout(title = "Number of jobs with earnings $1250/month or less in the City of Tacoma on a Tract Level", title.position = c("RIGHT", "TOP"))
+TRACT_MAP <- tm_shape(WACTRACT) +tm_polygons() +tm_symbols(col="Population") + tm_borders() +tm_layout(title = "Number of jobs with earnings $1250/month or less in the City of Tacoma on a Tract Level", title.position = c("RIGHT", "TOP"))
 
-TRACK_MAP
+TRACT_MAP
 ```
 
 
 #Part 3.4
-```{r PART3.3, include = TRUE}
+```{r PART3.4, include = TRUE}
 ###Create Map of OD 
-HomeTrack1 <-filter(ODDATA, ht == 53053060905)
+HomeTract1 <-filter(ODDATA, ht == 53053060905)
 
-Washingtontrackshp$wt = Washingtontrackshp$GEOID
+Washingtontractshp$wt = Washingtontractshp$GEOID
 
-HomeTrack1Merge <- merge(Washingtontrackshp, HomeTrack1, by=c("wt"), all = TRUE)
-HomeTrack1Merge[is.na(HomeTrack1Merge)] <- 0 
+HomeTract1Merge <- merge(Washingtontractshp, HomeTract1, by=c("wt"), all = TRUE)
+HomeTract1Merge[is.na(HomeTract1Merge)] <- 0 
 
- tm_shape(HomeTrack1Merge) +tm_polygons() +  tm_symbols(col="wt") + tm_borders() +tm_layout(title = "Points of places where people who live in area 53053060905 work", title.position = c("RIGHT", "TOP")) 
+ tm_shape(HomeTract1Merge) +tm_polygons() +  tm_symbols(col="wt") + tm_borders() +tm_layout(title = "Points of places where people who live in area 53053060905 work", title.position = c("RIGHT", "TOP")) 
 
 ```
 
-
+#Part 3.6
+```{r PART3.6, include = TRUE}
+```
 
