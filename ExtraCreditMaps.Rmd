@@ -1,0 +1,31 @@
+---
+title: "ExtraCredit"
+author: "Alberto Melendez"
+date: "February 14, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r}
+library(tmap)
+library(dplyr)
+library(tidyverse)
+library(sf)
+
+ODDATA <- read.csv("od2015_Tacoma.csv")
+WACT <- read.csv("wac2015_Tacoma.csv")
+WACB <- read.csv("wac2015_Tacoma_Block.csv")
+tacomablockshp <- st_read("tacomablocks-polygon.shp")
+tacomatractshp <- st_read("pie10ct.shp")
+Washingtontractshp <- st_read("cb_2017_53_tract_500k.shp")
+
+WACB$GEOID10= WACB$w_geocode
+
+WACBLOCK <- merge(tacomablockshp, WACB, by=c("GEOID10"))
+
+WACT$GEOID10 = WACT$wt
+WACTRACT <- merge(tacomatractshp, WACT, by=c("GEOID10"))
+```
