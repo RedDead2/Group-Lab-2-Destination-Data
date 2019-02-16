@@ -22,10 +22,25 @@ tacomablockshp <- st_read("tacomablocks-polygon.shp")
 tacomatractshp <- st_read("pie10ct.shp")
 Washingtontractshp <- st_read("cb_2017_53_tract_500k.shp")
 
-WACB$GEOID10= WACB$w_geocode
+WACB$GEOID10 <-  WACB$w_geocode
 
 WACBLOCK <- merge(tacomablockshp, WACB, by=c("GEOID10"))
 
-WACT$GEOID10 = WACT$wt
+WACT$GEOID10 <- WACT$wt
 WACTRACT <- merge(tacomatractshp, WACT, by=c("GEOID10"))
+
+#WACB$wt <-  substr(WACB$GEOID10, 1, nchar(WACB$wt)-4)
+#WACT$wt <-  substr(WACT$GEOID10, 1, nchar(WACT$wt)-4)
+
+#WACT_WACB <- c(WACT, WACB)
+
+#tacoma_tract <- merge(tacomatractshp, WACT_WACB, by=("wt"))
+
+```
+
+```{r Manufacturing Jobs}
+WACTRACT$Manufacturing <- WACTRACT$CNS05
+
+tm_shape(WACTRACT) + tm_fill(col = "Manufacturing") + tm_borders()
+
 ```
