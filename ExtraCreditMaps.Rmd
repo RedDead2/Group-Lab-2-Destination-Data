@@ -19,7 +19,7 @@ ODDATA <- read.csv("od2015_Tacoma.csv")
 WACT <- read.csv("wac2015_Tacoma.csv")
 WACB <- read.csv("wac2015_Tacoma_Block.csv")
 tacomablockshp <- st_read("tacomablocks-polygon.shp")
-tacomatractshp <- st_read("pie10ct.shp")
+tacomatractshp <- st_read("tacoma_tract2.shp")
 Washingtontractshp <- st_read("cb_2017_53_tract_500k.shp")
 
 WACB$GEOID10 <-  WACB$w_geocode
@@ -43,4 +43,18 @@ WACTRACT$Manufacturing <- WACTRACT$CNS05
 
 tm_shape(WACTRACT) + tm_fill(col = "Manufacturing") + tm_borders()
 
+```
+
+```{r}
+
+WACTRACT$Transportation <- WACTRACT$CNS06
+
+tm_shape(WACTRACT) + tm_fill(col = "Transportation") + tm_borders()
+```
+
+```{r}
+
+WACTRACT$Healthcare <- WACTRACT$CNS16
+
+tm_shape(WACTRACT) + tm_fill(col = "Healthcare") + tm_borders()
 ```
